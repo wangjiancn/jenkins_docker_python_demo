@@ -1,0 +1,26 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.doubanio.com/simple"
+verify_ssl = true
+
+[dev-packages]
+pep8 = "*"
+autopep8 = "*"
+
+[packages]
+django = "*"
+pep8 = "*"
+arrow = "*"
+flake8 = "*"
+requests = "*"
+mysqlclient = "*"
+djangorestframework = "*"
+pyjwt = "*"
+sphinx = "*"
+ipython = "*"
+redis = "*"
+hiredis = "*"
+django-mysql = "*"
+
+[requires]
+python_version = "3.7"

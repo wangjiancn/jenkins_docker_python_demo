@@ -49,11 +49,18 @@ class Rate(BaseModel):
 
 
 class Post(BaseModel):
+
+    POST_KIND_OPTIONS = [('原创', '原创'), ('转载', '转载'), ('翻译', '翻译'), ('笔记', '笔记')]
+    POST_STATE_OPTIONS = [('草稿', '草稿'), ('已发布', '已发布'), ('已保存', '已保存')]
+
+    desc = models.CharField("描述", max_length=200, db_index=True)
+    private = models.BooleanField("是否为私密文章", default=False, db_index=True)
     title = models.CharField("标题", max_length=100, db_index=True)
     tags = models.ManyToManyField(Tag)
     markdown = models.TextField("Markdown正文")
     body = models.TextField("HTML正文")
-    kind = models.CharField("类型(文章/原创/笔记)", max_length=50)
+    kind = models.CharField("类型(文章/原创/笔记)", choices=POST_KIND_OPTIONS, db_index=True, max_length=50)
+    state = models.CharField("类型(文章/原创/笔记)", choices=POST_STATE_OPTIONS, db_index=True, max_length=50)
 
     author = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True)
     cat = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)

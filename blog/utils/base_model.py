@@ -1,12 +1,45 @@
 import uuid
 from abc import abstractmethod
 
-from django.db import models
-from django_mysql.models import Model, JSONField
+from django.db import models, transaction
+from django_mysql.models import JSONField, Model
+
 from acl.default_acl import row_acl
+from utils.api_response import APIError, APIResponseError
+from utils.tool import is_uuid
+
+
+class MyQuerySet(models.QuerySet):
+    def pagination(self, limit=20, offset=0):
+        meta = dict(total_count=self.count(),
+                    limit=limit,
+                    offset=offset)
+        objects = [o.to_dict() for o in self[offset:limit]]
+        return dict(meta=meta, objects=objects)
+
+    def get_or_api_404(self, **kwargs):
+        try:
+            # obj = super().get_queryset().get(**kwargs)
+            obj = self.get(**kwargs)
+        except:
+            raise APIError(10004)
+        else:
+            return obj
+
+
+class MyManager(models.Manager):
+    def get_queryset(self):
+        return MyQuerySet(self.model, using=self._db)
+
+    def get_or_api_404(self, **kwargs):
+        return self.get_queryset().get_or_api_404(**kwargs)
 
 
 class BaseModel(Model):
+    objects = MyManager()
+
+    fields_map = {}
+
     created = models.DateTimeField("创建时间", auto_now_add=True)
     last_modified = models.DateTimeField("最后修改时间", auto_now=True)
     # acl = JSONField(default=get_acl('row', level='sys'))

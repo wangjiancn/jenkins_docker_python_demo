@@ -1,8 +1,14 @@
-from django.http.response import HttpResponse
 import json
+
 from django.core.serializers.json import DjangoJSONEncoder
+from django.http.response import HttpResponse
 
 from .error_code import get_msg
+
+
+class APIError(Exception):
+    def __init__(self, code=-1):
+        self.code = code
 
 
 class APIResponse(HttpResponse):

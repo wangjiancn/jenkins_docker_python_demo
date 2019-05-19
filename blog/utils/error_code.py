@@ -6,6 +6,10 @@ code > 0 业务错误
 
 
 _code = {
+    -1: dict(
+        en='Unkown Error',
+        zh="未知错误"
+    ),
     # success
     0: dict(
         en='OK',
@@ -21,7 +25,7 @@ _code = {
         zh='参数错误'),
     10004: dict(
         en="articel not exist",
-        zh='文章不存在'),
+        zh='资源不存在'),
     10005: dict(
         en="user authenticate failed",
         zh='用户名或密码错误'),

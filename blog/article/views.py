@@ -19,18 +19,11 @@ class CategoryView(View):
 
     def get(self, r, *args, **kwargs):
         if kwargs.get('cat_id'):
-            cats = Category.objects.filter(id=kwargs.get(
-                'cat_id'))
-            if cats:
-                return APIResponse(cats[0].to_dict())
-            else:
-                return APIResponseError(10004)
+            cat = Category.objects.get_or_api_404(id=kwargs.get('cat_id'))
+            return APIResponse(cat.to_dict())
         else:
-            cats = Category.objects.all()
-            cat_list = Category.pagination(cats)
-            # for post in posts:
-            #     post_list.append(post.to_dict())
-            return APIResponse(cat_list)
+            cats = Category.objects.all().pagination()
+            return APIResponse(cats)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -38,18 +31,11 @@ class TagView(View):
 
     def get(self, r, *args, **kwargs):
         if kwargs.get('tag_id'):
-            tags = Post.objects.filter(id=kwargs.get(
-                'tag_id'))
-            if tags:
-                return APIResponse(tags[0].to_dict())
-            else:
-                return APIResponseError(10004)
+            tag = Post.objects.get_or_api_404(id=kwargs.get('tag_id'))
+            return APIResponse(tags.to_dict())
         else:
-            tags = Tag.objects.all()
-            tag_list = Tag.pagination(tags)
-            # for post in posts:
-            #     post_list.append(post.to_dict())
-            return APIResponse(tag_list)
+            tags = Tag.objects.all().pagination()
+            return APIResponse(tags)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -57,29 +43,20 @@ class PostView(View):
 
     def get(self, r, *args, **kwargs):
         if kwargs.get('post_id'):
-            post = Post.objects.filter(id=kwargs.get(
-                'post_id'))
-            if post:
-                return APIResponse(post[0].to_dict())
-            else:
-                return APIResponseError(10004)
+            post = Post.objects.get_or_api_404(id=kwargs.get('post_id'))
+            return APIResponse(post.to_dict())
         else:
-            posts = Post.objects.all()
-            post_list = Post.pagination(posts)
-            # for post in posts:
-            #     post_list.append(post.to_dict())
-            return APIResponse(post_list)
+            posts = Post.objects.all().pagination()
+            return APIResponse(posts)
 
     @method_decorator(token_required, name='dispatch')
     def post(self, r, *args, **kwargs):
         data = json.loads(r.body)
-        tags = data.pop('tags') if 'tags' in data.keys() else []
+        # tags = data.pop('tags') if 'tags' in data.keys() else []
         if kwargs.get('post_id'):
-            post = Post.objects.filter(id=kwargs.get('post_id')).update(**data)
-            post = Post.objects.get(id=post)
+            post = Post.objects.get_or_api_404(id=kwargs.get('post_id')).update_fields(**data)
         else:
             post = Post.objects.create(**data, author=r.user)
-        post.update_tag(tags)
         return APIResponse(post.to_dict())
 
 

@@ -42,11 +42,12 @@ class TagView(View):
 class PostView(View):
 
     def get(self, r, *args, **kwargs):
+        query = r.GET.dict()
         if kwargs.get('post_id'):
             post = Post.objects.get_or_api_404(id=kwargs.get('post_id'))
             return APIResponse(post.to_dict())
         else:
-            posts = Post.objects.all().pagination()
+            posts = Post.objects.filter(**query).pagination()
             return APIResponse(posts)
 
     @method_decorator(token_required, name='dispatch')
@@ -56,7 +57,7 @@ class PostView(View):
         if kwargs.get('post_id'):
             post = Post.objects.get_or_api_404(id=kwargs.get('post_id')).update_fields(**data)
         else:
-            post = Post.objects.create(**data, author=r.user)
+            post = Post.create(**data, author=r.user)
         return APIResponse(post.to_dict())
 
 

@@ -173,3 +173,34 @@ class BaseModel(Model):
                 setattr(self, field, value)
         self.save()
         return self
+
+    @classmethod
+    def create(cls, **data):
+        _field_map = cls._get_fields()
+        data_to_create = {}
+        foreign_key_data = {}
+        many_to_many_data = {}
+        for field, value in data.items():
+            field_meta = _field_map.get(field)
+            cls_name = field_meta.get('cls_name') if field_meta else None
+            if field_meta is None:
+                pass
+            elif cls_name == "ForeignKey":
+                model = field_meta.get('field').related_model
+                if isinstance(value, int):
+                    data_to_create[field] = model.objects.get_or_api_404(id=value)
+                elif isinstance(value, model):
+                    data_to_create[field] = value
+            elif cls_name == "ManyToManyField":
+                if isinstance(value, list):
+                    model = field_meta.get('field').related_model
+                    many_to_many_data[field] = model.objects.filter(id__in=value)
+            elif cls_name.endswith('Field'):
+                data_to_create[field] = value
+        obj = cls(**data_to_create)
+        obj.save()
+        if many_to_many_data:
+            for field, value in many_to_many_data.items():
+                attr = getattr(obj, field)
+                attr.set(value)
+        return obj

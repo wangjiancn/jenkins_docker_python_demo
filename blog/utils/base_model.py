@@ -14,7 +14,7 @@ class MyQuerySet(models.QuerySet):
         meta = dict(total_count=self.count(),
                     limit=limit,
                     offset=offset)
-        objects = [o.to_dict() for o in self[offset:limit]]
+        objects = [o.to_dict() for o in self[offset:offset + limit]]
         return dict(meta=meta, objects=objects)
 
     def get_or_api_404(self, **kwargs):

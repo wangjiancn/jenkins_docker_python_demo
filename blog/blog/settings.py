@@ -15,12 +15,20 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Envirnment
+ENV_MYSQL_USERNAME = os.environ.get('ENV_MYSQL_USERNAME', 'root')
+ENV_MYSQL_PASSWORD = os.environ.get('ENV_MYSQL_PASSWORD', '123456')
+ENV_MYSQL_HOST = os.environ.get('ENV_MYSQL_HOST', '127.0.0.1')
+ENV_MYSQL_POST = os.environ.get('ENV_MYSQL_POST', '3306')
+ENV_MYSQL_DATABASE_NAME = os.environ.get('ENV_MYSQL_DATABASE_NAME', 'djangoBlog')
+
+ENV_BLOG_SECRET_KEY = os.environ.get('ENV_BLOG_SECRET_KEY', 'secret_key')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 's7=#kfjt$i35u_z6px_&&tm+b-ty2s(*qd94m2eu4_y40%grou'
+SECRET_KEY = ENV_BLOG_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -86,11 +94,11 @@ WSGI_APPLICATION = 'blog.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'djangoBlog',
-        'USER': 'root',
-        'PASSWORD': '000...',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'NAME': ENV_MYSQL_DATABASE_NAME,
+        'USER': ENV_MYSQL_USERNAME,
+        'PASSWORD': ENV_MYSQL_PASSWORD,
+        'HOST': ENV_MYSQL_HOST,
+        'PORT': ENV_MYSQL_POST,
         'OPTIONS': {'charset': 'utf8mb4'},
         'TEST': {'CHARSET': 'utf8mb4', 'COLLATION': 'utf8mb4_unicode_ci'}
     },

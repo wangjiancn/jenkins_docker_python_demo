@@ -44,14 +44,19 @@ class PostView(View):
     def get(self, r, *args, **kwargs):
         query = r.GET.dict()
         pagination = {
-            'limit': int(query.pop('limit')) if 'limit' in query.keys() else 10,
-            'offset': int(query.pop('offset')) if 'offset' in query.keys() else 0
+            'limit': int(query.pop('limit', 10)),
+            'offset': int(query.pop('offset', 0))
         }
+        order_by = query.pop('order_by', ['-views_count'])
+        search = query.pop('search', '')
+        if search:
+            query.update(title__icontains=search)
         if kwargs.get('post_id'):
             post = Post.objects.get_or_api_404(id=kwargs.get('post_id'))
+            post.add_view_count()
             return APIResponse(post.to_dict())
         else:
-            posts = Post.objects.filter(**query).pagination(**pagination)
+            posts = Post.objects.filter(**query).order_by(*order_by).pagination(**pagination)
             return APIResponse(posts)
 
     @method_decorator(token_required, name='dispatch')

@@ -61,6 +61,7 @@ class Post(BaseModel):
     body = models.TextField("HTML正文")
     kind = models.CharField("类型(文章/原创/笔记)", choices=POST_KIND_OPTIONS, db_index=True, max_length=50)
     state = models.CharField("类型(文章/原创/笔记)", choices=POST_STATE_OPTIONS, db_index=True, max_length=50)
+    views_count = models.IntegerField('访问次数', default=0, db_index=True)
 
     author = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True)
     cat = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
@@ -84,3 +85,7 @@ class Post(BaseModel):
                 else:
                     tag_instances.append(Tag.objects.get(uuid=tag))
             self.tags.set(tag_instances)
+
+    def add_view_count(self):
+        self.views_count = self.views_count + 1
+        self.save()

@@ -1,4 +1,5 @@
 import uuid
+import datetime
 from abc import abstractmethod
 
 from django.db import models, transaction
@@ -41,7 +42,7 @@ class BaseModel(Model):
     fields_map = {}
 
     created = models.DateTimeField("创建时间", auto_now_add=True)
-    last_modified = models.DateTimeField("最后修改时间", auto_now=True)
+    last_modified = models.DateTimeField("最后修改时间")
     # acl = JSONField(default=get_acl('row', level='sys'))
     acl = JSONField(default=row_acl)
     is_active = models.BooleanField("删除标记", default=True)
@@ -100,7 +101,7 @@ class BaseModel(Model):
                 value = [i.to_dict() for i in attr.all()] if attr else []
             else:
                 value = self.__dict__[field_name]
-            if value:
+            if field_name != 'acl':
                 data[field_name] = value
         return data
 
@@ -171,7 +172,7 @@ class BaseModel(Model):
                 attr.set(value)
             else:
                 setattr(self, field, value)
-        self.save()
+        self.save_to_now()
         return self
 
     @classmethod
@@ -198,9 +199,13 @@ class BaseModel(Model):
             elif cls_name.endswith('Field'):
                 data_to_create[field] = value
         obj = cls(**data_to_create)
-        obj.save()
+        obj.save_to_now()
         if many_to_many_data:
             for field, value in many_to_many_data.items():
                 attr = getattr(obj, field)
                 attr.set(value)
         return obj
+
+    def save_to_now(self):
+        self.last_modified = datetime.datetime.now()
+        self.save()

@@ -39,6 +39,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'cqi.apps.CQIConfig',
     'acl.apps.AclConfig',
     'article.apps.ArticleConfig',
     'django.contrib.admin',

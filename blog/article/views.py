@@ -56,7 +56,7 @@ class PostView(View):
             post.add_view_count()
             return APIResponse(post.to_dict())
         else:
-            posts = Post.objects.filter(**query).order_by(*order_by).pagination(**pagination)
+            posts = Post.objects.active(**query).order_by(*order_by).pagination(**pagination)
             return APIResponse(posts)
 
     @method_decorator(token_required, name='dispatch')
@@ -68,6 +68,14 @@ class PostView(View):
         else:
             post = Post.create(**data, author=r.user)
         return APIResponse(post.to_dict())
+
+    @method_decorator(token_required, name='dispatch')
+    def delete(self, r, *args, **kwargs):
+        if kwargs.get('post_id'):
+            Post.objects.active(id=kwargs.get('post_id')).delete()
+            return APIResponse()
+        else:
+            return APIResponse(code=10003)
 
 
 def index(r):

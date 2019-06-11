@@ -31,7 +31,10 @@ _code = {
         zh='用户名或密码错误'),
     10006: dict(
         en="Invlid token",
-        zh='无效的Token')
+        zh='无效的Token'),
+    10007: dict(
+        en="expire token",
+        zh='过期的Token'),
 
     # server level code
 }

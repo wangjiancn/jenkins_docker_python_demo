@@ -13,6 +13,8 @@ def token_required(view_func):
             return APIResponseError(10001)
         try:
             request_jwt = jwt.decode(authorization, settings.SECRET_KEY, True)
+        except jwt.ExpiredSignatureError:
+            return APIResponseError(10007)
         except jwt.DecodeError:
             return APIResponseError(10006)
         else:

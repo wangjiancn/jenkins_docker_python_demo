@@ -27,13 +27,23 @@ class MyQuerySet(models.QuerySet):
         else:
             return obj
 
+    def delete(self):
+        return self.update(is_active=False)
+
+    def true_delete(self):
+        return super(MyQuerySet, self).delete()
+
 
 class MyManager(models.Manager):
-    def get_queryset(self):
+    def get_queryset(self) -> MyQuerySet:
         return MyQuerySet(self.model, using=self._db)
 
     def get_or_api_404(self, **kwargs):
         return self.get_queryset().get_or_api_404(**kwargs)
+
+    def active(self, *args, ** filters):
+        filters.update(is_active=True)
+        return self.get_queryset().filter(*args, **filters)
 
 
 class BaseModel(Model):

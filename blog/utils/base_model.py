@@ -52,7 +52,7 @@ class BaseModel(Model):
     fields_map = {}
 
     created = models.DateTimeField("创建时间", auto_now_add=True)
-    last_modified = models.DateTimeField("最后修改时间")
+    last_modified = models.DateTimeField("最后修改时间", auto_now_add=True)
     # acl = JSONField(default=get_acl('row', level='sys'))
     acl = JSONField(default=row_acl)
     is_active = models.BooleanField("删除标记", default=True)

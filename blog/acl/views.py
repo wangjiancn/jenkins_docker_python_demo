@@ -15,7 +15,7 @@ def register(r):
     """注册"""
     data = json.loads(r.body)
     user = UserProfile.objects.create_user(**data)
-    return APIResponse(token=user.token)
+    return APIResponse(user.token)
 
 
 @csrf_exempt

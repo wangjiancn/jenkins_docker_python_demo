@@ -7,6 +7,12 @@ from .error_code import get_msg
 
 
 class APIError(Exception):
+    """服务端未知错误,会被中间件捕获返回ApiResponseError(code)
+
+    Args:
+        code (int, optional): 错误状态码参考utils.error_code. Defaults to -1.
+    """
+
     def __init__(self, code=-1):
         self.code = code
 

@@ -32,7 +32,6 @@ SECRET_KEY = ENV_BLOG_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('ENV_DEBUG', 'true') == 'true'
-print('DEBUG', DEBUG, os.environ.get('ENV_DEBUG'))
 
 ALLOWED_HOSTS = ['*']
 

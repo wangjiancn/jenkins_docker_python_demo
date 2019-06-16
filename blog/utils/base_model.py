@@ -12,15 +12,53 @@ from utils.tool import is_uuid
 
 class MyQuerySet(models.QuerySet):
     def pagination(self, limit=20, offset=0):
+        """分页
+
+        Args:
+            limit (int, optional): 返回数据条数. Defaults to 20.
+            offset (int, optional): 偏移量. Defaults to 0.
+
+        Returns:
+            Dict: 返回格式如下:
+                {
+                    "meta": {
+                        "total_count": 20,
+                        "limit": 20,
+                        "offset": 0
+                    },
+                    "objects": [
+                        {
+                            "id": 16,
+                            "created": "2019-05-26T13:01:15.411Z",
+                            "last_modified": "2019-05-26T13:01:15.411Z",
+                            "name": "flask",
+                        },
+                        ......
+                        {
+                            "id": 36,
+                            "created": "2019-06-16T11:00:48.618Z",
+                            "last_modified": "2019-06-16T11:00:48.618Z",
+                            "name": "test",
+                        }
+                    ]
+                }
+        """
         meta = dict(total_count=self.count(),
                     limit=limit,
                     offset=offset)
         objects = [o.to_dict() for o in self[offset:offset + limit]]
         return dict(meta=meta, objects=objects)
 
-    def get_or_api_404(self, **kwargs):
+    def get_or_api_404(self, **kwargs) -> 'BaseModel':
+        """使用get()方法获取实例,找不到资源抛出APIError
+
+        Raises:
+            APIError: code=10004
+
+        Returns:
+            instance: 找到资源后返回模型实例
+        """
         try:
-            # obj = super().get_queryset().get(**kwargs)
             obj = self.get(**kwargs)
         except:
             raise APIError(10004)
@@ -28,20 +66,25 @@ class MyQuerySet(models.QuerySet):
             return obj
 
     def delete(self):
+        """软删除
+        """
         return self.update(is_active=False)
 
     def true_delete(self):
+        """硬删除
+        """
         return super(MyQuerySet, self).delete()
 
 
 class MyManager(models.Manager):
+
     def get_queryset(self) -> MyQuerySet:
         return MyQuerySet(self.model, using=self._db)
 
-    def get_or_api_404(self, **kwargs):
+    def get_or_api_404(self, **kwargs) -> 'BaseModel':
         return self.get_queryset().get_or_api_404(**kwargs)
 
-    def active(self, *args, ** filters):
+    def active(self, *args, **filters) -> MyQuerySet:
         filters.update(is_active=True)
         return self.get_queryset().filter(*args, **filters)
 
@@ -146,7 +189,7 @@ class BaseModel(Model):
                 _no_field[field] = value
         foreignkey_data = self._get_foreignKey(**_foreignkey_data)
         manytomany_data = self._get_manyToMany(**_manytomany_data)
-        self.update(**field_data, **foreignkey_data, **manytomany_data)
+        self.__update(**field_data, **foreignkey_data, **manytomany_data)
         return self
 
     def _get_foreignKey(self, **kwargs):
@@ -174,7 +217,7 @@ class BaseModel(Model):
                 return {}
         return _data
 
-    def update(self, **data):
+    def __update(self, **data):
         _field_map = self._get_fields()
         for field, value in data.items():
             if _field_map.get(field).get('cls_name') == "ManyToManyField":
@@ -217,6 +260,8 @@ class BaseModel(Model):
         return obj
 
     def save_to_now(self):
+        """保存时修改最后修改时间为当前时间
+        """
         self.last_modified = datetime.datetime.now()
         self.save()
 

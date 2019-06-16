@@ -1,3 +1,5 @@
+import re
+
 from django.conf import settings
 from functools import wraps
 from utils.api_response import APIResponseError
@@ -12,6 +14,7 @@ def token_required(view_func):
         if not authorization:
             return APIResponseError(10001)
         try:
+            authorization = re.sub('Bearer\s', '', authorization)
             request_jwt = jwt.decode(authorization, settings.SECRET_KEY, True)
         except jwt.ExpiredSignatureError:
             return APIResponseError(10007)

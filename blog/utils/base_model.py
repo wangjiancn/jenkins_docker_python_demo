@@ -219,3 +219,14 @@ class BaseModel(Model):
     def save_to_now(self):
         self.last_modified = datetime.datetime.now()
         self.save()
+
+    def delete(self):
+        """软删除,将is_active字段设置为False
+        """
+        self.is_active = False
+        self.save()
+
+    def ture_delete(self):
+        """真实从数据库中删除
+        """
+        super(BaseModel, self).delete()

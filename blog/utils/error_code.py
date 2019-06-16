@@ -35,6 +35,13 @@ _code = {
     10007: dict(
         en="expire token",
         zh='过期的Token'),
+    10008: dict(
+        en="Illegal model name",
+        zh='非法的Model名称'),
+    10009: dict(
+        en="Illegal operation",
+        zh="非法操作"
+    )
 
     # server level code
 }

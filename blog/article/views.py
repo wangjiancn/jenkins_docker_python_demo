@@ -5,11 +5,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.utils.decorators import method_decorator
 from acl.auth_wrap import token_required
-from django.shortcuts import render
 
 from .models import Post, Tag, Category
 from utils.api_response import APIResponse, APIResponseError
-from utils.tool import is_uuid
+from utils.tool import is_uuid, parse_query_string
 
 # Create your views here.
 
@@ -19,10 +18,10 @@ class CategoryView(View):
 
     def get(self, r, *args, **kwargs):
         if kwargs.get('cat_id'):
-            cat = Category.objects.get_or_api_404(id=kwargs.get('cat_id'))
+            cat = Category.objects.active().get_or_api_404(id=kwargs.get('cat_id'))
             return APIResponse(cat.to_dict())
         else:
-            cats = Category.objects.all().pagination()
+            cats = Category.objects.active().all().pagination()
             return APIResponse(cats)
 
 
@@ -31,10 +30,10 @@ class TagView(View):
 
     def get(self, r, *args, **kwargs):
         if kwargs.get('tag_id'):
-            tag = Post.objects.get_or_api_404(id=kwargs.get('tag_id'))
-            return APIResponse(tags.to_dict())
+            tag = Post.objects.active().get_or_api_404(id=kwargs.get('tag_id'))
+            return APIResponse(tag.to_dict())
         else:
-            tags = Tag.objects.all().pagination()
+            tags = Tag.objects.active().all().pagination()
             return APIResponse(tags)
 
 
@@ -42,21 +41,16 @@ class TagView(View):
 class PostView(View):
 
     def get(self, r, *args, **kwargs):
-        query = r.GET.dict()
-        pagination = {
-            'limit': int(query.pop('limit', 10)),
-            'offset': int(query.pop('offset', 0))
-        }
-        order_by = query.pop('order_by', ['-views_count'])
-        search = query.pop('search', '')
+        pagination, order_by, filters, defer = parse_query_string(r.GET)
+        search = filters.pop('search', '')
         if search:
-            query.update(title__icontains=search)
+            filters.update(title__icontains=search)
         if kwargs.get('post_id'):
-            post = Post.objects.get_or_api_404(id=kwargs.get('post_id'))
+            post = Post.objects.active().get_or_api_404(id=kwargs.get('post_id'))
             post.add_view_count()
             return APIResponse(post.to_dict())
         else:
-            posts = Post.objects.active(**query).order_by(*order_by).pagination(**pagination)
+            posts = Post.objects.active(**filters).defer(*defer).order_by(*order_by).pagination(**pagination)
             return APIResponse(posts)
 
     @method_decorator(token_required, name='dispatch')

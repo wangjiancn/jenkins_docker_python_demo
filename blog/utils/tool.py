@@ -14,7 +14,8 @@ def is_uuid(arg):
         return True
 
 
-def parse_query_string(queryDict: QueryDict) -> NamedTuple('query', pagination=dict, order_by=list, filters=dict):
+def parse_query_string(queryDict: QueryDict) -> NamedTuple(
+        'query', pagination=dict, order_by=list, filters=dict, defer=list):
     """从请求中解析查询参数
 
     Args:
@@ -27,14 +28,20 @@ def parse_query_string(queryDict: QueryDict) -> NamedTuple('query', pagination=d
 
     _clone = queryDict.copy()
 
-    Query = namedtuple('Query', 'pagination, order_by, filters')
+    Query = namedtuple('Query', 'pagination, order_by, filters, defer')
 
     order_by = _clone.pop('order_by', [])
     pagination = {
-        'limit': _clone.pop('limit', [10])[-1],
-        'offset': _clone.pop('offset', [0])[-1],
+        'limit': int(_clone.pop('limit', [10])[-1]),
+        'offset': int(_clone.pop('offset', [0])[-1]),
     }
+
+    defer = []
+    defer_query = _clone.pop('defer', [])
+    for i in defer_query:
+        defer.extend(i.split(','))
+
     filters = _clone.dict()
 
-    query = Query(pagination, order_by, filters)
+    query = Query(pagination, order_by, filters, defer)
     return query

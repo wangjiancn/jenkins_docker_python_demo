@@ -1,6 +1,7 @@
 import json
 
 from django.apps import apps
+from django.db.models import Q
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -16,6 +17,7 @@ from utils.tool import parse_query_string
 
 model_name_map = {
     'post': 'article.post',
+    'article': 'article.post',
     'tag': 'article.tag',
     'category': 'article.category',
 }
@@ -42,7 +44,7 @@ class QueryView(View):
         model = apps.get_model(app_lable__model_name)
         return model
 
-    def get(self, r: str, *args, **kwargs):
+    def get(self, r, *args, **kwargs):
         model_name = kwargs.get('model_name')
         model = self.get_model(model_name)
 
@@ -50,7 +52,12 @@ class QueryView(View):
         if _id:
             data = model.objects.active().get_or_api_404(id=_id).to_dict()
         else:
-            data = model.objects.active().pagination()
+            query = parse_query_string(r.GET, model_name)
+            data = model.objects\
+                .active(query.search, **query.filters)\
+                .defer(*query.defer)\
+                .order_by(*query.order_by)\
+                .pagination(**query.pagination)
 
         return APIResponse(data)
 

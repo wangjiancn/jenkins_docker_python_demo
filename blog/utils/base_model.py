@@ -154,7 +154,7 @@ class BaseModel(Model):
                 value = [i.to_dict() for i in attr.all()] if attr else []
             else:
                 value = self.__dict__.get(field_name)
-            if field_name != 'acl' and value:
+            if field_name != 'acl':
                 data[field_name] = value
         return data
 

@@ -55,6 +55,7 @@ class Post(BaseModel):
 
     desc = models.CharField("描述", max_length=200, db_index=True)
     private = models.BooleanField("是否为私密文章", default=False, db_index=True)
+    is_publish = models.BooleanField("是否发布", default=False, db_index=True)
     title = models.CharField("标题", max_length=100, db_index=True)
     tags = models.ManyToManyField(Tag)
     markdown = models.TextField("Markdown正文")

@@ -2,11 +2,14 @@ import json
 import uuid
 
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.views import View
+from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from acl.auth_wrap import token_required
 
 from .models import Post, Tag, Category
+from .action import actions
 from utils.api_response import APIResponse, APIResponseError
 from utils.tool import is_uuid, parse_query_string
 
@@ -75,3 +78,9 @@ class PostView(View):
 def index(r):
     return render(r, 'index.html')
     return APIResponse(dict(name='hello world'))
+
+
+@require_POST
+@csrf_exempt
+def action(r, *args, **kwargs):
+    return actions.run_action(r, *args, **kwargs)

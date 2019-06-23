@@ -41,6 +41,10 @@ _code = {
     10009: dict(
         en="Illegal operation",
         zh="非法操作"
+    ),
+    11001: dict(
+        en="action not exist",
+        zh="该操作不存在"
     )
 
     # server level code

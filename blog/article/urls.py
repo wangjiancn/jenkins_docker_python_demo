@@ -9,4 +9,5 @@ urlpatterns = [
     path('tag/', views.TagView.as_view()),
     path('cat/', views.CategoryView.as_view()),
     path('', views.index),
+    path('action/<str:action_name>/', views.action)
 ]

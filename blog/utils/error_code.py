@@ -45,6 +45,14 @@ _code = {
     11001: dict(
         en="action not exist",
         zh="该操作不存在"
+    ),
+    12001: dict(
+        en="ext not allow",
+        zh="不支持的文件类型"
+    ),
+    12002: dict(
+        en="file not exists",
+        zh="未找到文件"
     )
 
     # server level code

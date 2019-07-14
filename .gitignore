@@ -218,3 +218,6 @@ upload/*.*
 
 .vscode
 /node_modules
+
+media/**/*.*
+!.gitkeep

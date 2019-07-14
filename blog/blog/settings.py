@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # ../../blog
 
 # Envirnment
 ENV_MYSQL_USERNAME = os.environ.get('ENV_MYSQL_USERNAME', 'root')
@@ -21,6 +21,10 @@ ENV_MYSQL_PASSWORD = os.environ.get('ENV_MYSQL_PASSWORD', '123456')
 ENV_MYSQL_HOST = os.environ.get('ENV_MYSQL_HOST', '127.0.0.1')
 ENV_MYSQL_POST = os.environ.get('ENV_MYSQL_POST', '3306')
 ENV_MYSQL_DATABASE_NAME = os.environ.get('ENV_MYSQL_DATABASE_NAME', 'djangoBlog')
+ENV_UPLOAD_PATH = os.environ.get(
+    'ENV_UPLOAD_PATH',
+    os.path.join(os.path.dirname(BASE_DIR), 'media')  # ../../media
+)
 
 ENV_BLOG_SECRET_KEY = os.environ.get('ENV_BLOG_SECRET_KEY', 'secret_key')
 
@@ -41,6 +45,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'cqi.apps.CQIConfig',
     'acl.apps.AclConfig',
+    'upload.apps.UploadConfig',
     'article.apps.ArticleConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -145,4 +150,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 # STATIC_ROOT = os.path.join(BASE_DIR, 'dist/static')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'dist/static')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'dist/static'), ENV_UPLOAD_PATH]

@@ -44,16 +44,13 @@ class TagView(View):
 class PostView(View):
 
     def get(self, r, *args, **kwargs):
-        pagination, order_by, filters, defer = parse_query_string(r.GET)
-        search = filters.pop('search', '')
-        if search:
-            filters.update(title__icontains=search)
+        pagination, order_by, filters, defer, search = parse_query_string(r.GET, 'post')
         if kwargs.get('post_id'):
-            post = Post.objects.active().get_or_api_404(id=kwargs.get('post_id'))
+            post = Post.objects.active().defer(*defer).get_or_api_404(id=kwargs.get('post_id'))
             post.add_view_count()
             return APIResponse(post.to_dict())
         else:
-            posts = Post.objects.active(**filters).defer(*defer).order_by(*order_by).pagination(**pagination)
+            posts = Post.objects.active(search, **filters).defer(*defer).order_by(*order_by).pagination(**pagination)
             return APIResponse(posts)
 
     @method_decorator(token_required, name='dispatch')

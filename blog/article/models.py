@@ -52,6 +52,7 @@ class Post(BaseModel):
 
     POST_KIND_OPTIONS = [('原创', '原创'), ('转载', '转载'), ('翻译', '翻译'), ('笔记', '笔记')]
     POST_STATE_OPTIONS = [('草稿', '草稿'), ('已发布', '已发布'), ('已保存', '已保存')]
+    POST_TYPE_OPTIONS = [('article', '文章'), ('wiki', 'wiki')]
 
     desc = models.CharField("描述", max_length=200, db_index=True)
     private = models.BooleanField("是否为私密文章", default=False, db_index=True)
@@ -60,8 +61,10 @@ class Post(BaseModel):
     tags = models.ManyToManyField(Tag)
     markdown = models.TextField("Markdown正文")
     body = models.TextField("HTML正文")
-    kind = models.CharField("类型(文章/原创/笔记)", choices=POST_KIND_OPTIONS, db_index=True, max_length=50)
-    state = models.CharField("类型(文章/原创/笔记)", choices=POST_STATE_OPTIONS, db_index=True, max_length=50)
+    kind = models.CharField("种类(文章/原创/笔记)", choices=POST_KIND_OPTIONS, db_index=True, max_length=50)
+    post_type = models.CharField("类型(wiki/文章)", choices=POST_TYPE_OPTIONS,
+                                 default='article', db_index=True, max_length=50)
+    rate = models.SmallIntegerField('文章进度(1-5,计划中，草稿，编写中，待完善，已完成)', default=1, db_index=True)
     views_count = models.IntegerField('访问次数', default=0, db_index=True)
 
     author = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True)
@@ -71,6 +74,11 @@ class Post(BaseModel):
         return f'{self.id}-{self.title}'
 
     def to_dict(self):
+        """将模型对象转换为
+
+        Returns:
+            dict: 模型对象
+        """
         data = self._to_dict()
         data.update(
             tags=list(self.tags.values()) if self.tags else [],
@@ -78,6 +86,12 @@ class Post(BaseModel):
         return data
 
     def update_tag(self, tags, user_id=0):
+        """更新文章tag
+
+        Args:
+            tags (id or str): 标签ID或者标签文字
+            user_id (int, optional): 用户ID. Defaults to 0.
+        """
         if tags:
             tag_instances = []
             for tag in tags:
@@ -87,6 +101,11 @@ class Post(BaseModel):
                     tag_instances.append(Tag.objects.get(uuid=tag))
             self.tags.set(tag_instances)
 
-    def add_view_count(self):
-        self.views_count = self.views_count + 1
+    def add_view_count(self, count=1):
+        """增加文章访问量
+
+        Args:
+            count (int, optional): 增加的访问量. Defaults to 1.
+        """
+        self.views_count = self.views_count + count
         self.save()

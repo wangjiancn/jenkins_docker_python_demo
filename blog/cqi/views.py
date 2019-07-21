@@ -25,6 +25,7 @@ model_name_map = {
 
 @method_decorator(csrf_exempt, name="dispatch")
 class QueryView(View):
+    """通用Restful API接口"""
 
     def get_model(self, model_name: str) -> BaseModel:
         """从指定模型中获取Django模型对象,未指定抛出APIError
@@ -45,6 +46,14 @@ class QueryView(View):
         return model
 
     def get(self, r, *args, **kwargs):
+        """HTTP GET方法
+
+        Args:
+            r (request): request对象 
+
+        Returns:
+            JSON对象或者错误信息
+        """
         model_name = kwargs.get('model_name')
         model = self.get_model(model_name)
 
@@ -63,6 +72,16 @@ class QueryView(View):
 
     @method_decorator(token_required, name="dispatch")
     def post(self, r, *args, **kwargs):
+        """HTTP POST方法
+
+        更新资源
+
+        Args:
+            r (request): [description]
+
+        Returns:
+            JSON
+        """
         model_name = kwargs.get('model_name')
         model = self.get_model(model_name)
         data = json.loads(r.body)
@@ -77,6 +96,19 @@ class QueryView(View):
 
     @method_decorator(token_required, name="dispatch")
     def delete(self, r, *args, **kwargs):
+        """HTTP DELETE方法
+
+        Args:
+            r (requests): request对象
+
+        Raises:
+            APIError: API错误
+
+        Returns:
+            JSON
+
+        DELETE /post/1  删除 id = 1 的文章
+        """
         model_name = kwargs.get('model_name')
         model = self.get_model(model_name)
 

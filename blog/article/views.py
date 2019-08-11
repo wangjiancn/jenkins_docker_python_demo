@@ -32,11 +32,12 @@ class CategoryView(View):
 class TagView(View):
 
     def get(self, r, *args, **kwargs):
+        pagination, order_by, filters, defer, search = parse_query_string(r.GET, 'post')
         if kwargs.get('tag_id'):
-            tag = Post.objects.active().get_or_api_404(id=kwargs.get('tag_id'))
+            tag = Post.objects.active().defer(*defer).get_or_api_404(id=kwargs.get('tag_id'))
             return APIResponse(tag.to_dict())
         else:
-            tags = Tag.objects.active().all().pagination()
+            tags = Tag.objects.active().defer(*defer).order_by(*order_by).pagination(**pagination)
             return APIResponse(tags)
 
 

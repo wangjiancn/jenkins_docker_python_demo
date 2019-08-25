@@ -5,6 +5,7 @@ pipeline {
     }
     stages {
         stage('Build') {
+            agent any
             steps{
                 script{
                     def django_project = docker.build("test-image:${env.BUILD_ID}")

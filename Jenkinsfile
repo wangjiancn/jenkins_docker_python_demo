@@ -5,8 +5,10 @@ pipeline {
     }
     stages {
         stage('Build') {
-            script{
-                def django_project = docker.build("test-image:${env.BUILD_ID}")
+            steps{
+                script{
+                    def django_project = docker.build("test-image:${env.BUILD_ID}")
+                }
             }
         }
         stage('Deploy') {

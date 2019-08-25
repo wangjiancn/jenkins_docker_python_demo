@@ -8,7 +8,7 @@ pipeline {
             agent any
             steps{
                 script{
-                    def django_project = docker.build("test-image:${env.BUILD_ID}","./docker/Dockerfile.v8")
+                    def django_project = docker.build("test-image:${env.BUILD_ID}","./docker/Dockerfile.v8 .")
                 }
             }
         }

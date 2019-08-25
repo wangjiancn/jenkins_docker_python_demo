@@ -1,0 +1,42 @@
+FROM python:3.7.4-alpine
+
+LABEL description="python with mysqlclient,pipenv,uwsgi, nginx, and r"
+LABEL size="153mb"
+
+# 在项目目录创建 .venv存放虚拟环境
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
+    apk add --no-cache mariadb-connector-c-dev pcre nginx;\
+    apk add --no-cache --virtual .build-deps \
+        build-base  \
+        mariadb-dev \
+        python3-dev \
+        linux-headers \
+        pcre-dev\
+    && pip install \
+    --trusted-host=pypi.douban.com \
+    -i http://pypi.douban.com/simple/ \
+    --no-cache-dir \
+    pipenv mysqlclient uwsgi\
+    && mkdir -p /run/nginx \
+    && touch /run/nginx/nginx.pid
+
+ENV PIPENV_VENV_IN_PROJECT = 1
+
+WORKDIR /app
+
+COPY Pipfile .
+COPY Pipfile.lock .
+RUN pipenv install --system && apk del .build-deps
+COPY blog .
+COPY docker/start.sh .
+COPY docker/uwsgi.ini .
+COPY docker/default.conf /etc/nginx/conf.d/default.conf
+
+
+
+EXPOSE 80
+
+ENTRYPOINT ["sh", "start.sh" ]
+
+#ENTRYPOINT [ "pipenv","run","blog/manage.py","runserver","0.0.0.0:5000" ]

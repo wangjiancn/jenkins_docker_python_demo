@@ -10,7 +10,7 @@ pipeline {
                     sh "printenv"
                     sh "echo printenv complete"
                     script{
-                        docker.withRegistry("${env.DOCKER_REG_ALI}", "docker") {
+                        docker.withRegistry("https://${env.DOCKER_REG_ALI}", "docker") {
                             def django_project = docker.build("${env.DOCKER_REG_ALI}/test-docker-image:${env.BUILD_ID}","-f ./docker/Dockerfile.v8 .")
                             django_project.push()
                         }

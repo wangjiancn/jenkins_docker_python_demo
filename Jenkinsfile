@@ -6,9 +6,12 @@ pipeline {
     stages {
         stage('Build') {
             agent any
-            steps{
-                script{
-                    def django_project = docker.build("test-image:${env.BUILD_ID}","-f ./docker/Dockerfile.v8 .")
+            docker.withRegistry('https://registry.example.com') {
+                steps{
+                    sh "printenv"
+                    script{
+                        def django_project = docker.build("test-docker-image:${env.BUILD_ID}","-f ./docker/Dockerfile.v8 .")
+                    }
                 }
             }
         }

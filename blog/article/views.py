@@ -1,5 +1,6 @@
 import json
 import uuid
+import os
 
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -32,12 +33,14 @@ class CategoryView(View):
 class TagView(View):
 
     def get(self, r, *args, **kwargs):
-        pagination, order_by, filters, defer, search = parse_query_string(r.GET, 'post')
+        pagination, order_by, filters, defer, search = parse_query_string(
+            r.GET, 'post')
         if kwargs.get('tag_id'):
             tag = Post.objects.active().defer(*defer).get_or_api_404(id=kwargs.get('tag_id'))
             return APIResponse(tag.to_dict())
         else:
-            tags = Tag.objects.active().defer(*defer).order_by(*order_by).pagination(**pagination)
+            tags = Tag.objects.active().defer(
+                *defer).order_by(*order_by).pagination(**pagination)
             return APIResponse(tags)
 
 
@@ -45,13 +48,15 @@ class TagView(View):
 class PostView(View):
 
     def get(self, r, *args, **kwargs):
-        pagination, order_by, filters, defer, search = parse_query_string(r.GET, 'post')
+        pagination, order_by, filters, defer, search = parse_query_string(
+            r.GET, 'post')
         if kwargs.get('post_id'):
             post = Post.objects.active().defer(*defer).get_or_api_404(id=kwargs.get('post_id'))
             post.add_view_count()
             return APIResponse(post.to_dict())
         else:
-            posts = Post.objects.active(search, **filters).defer(*defer).order_by(*order_by).pagination(**pagination)
+            posts = Post.objects.active(
+                search, **filters).defer(*defer).order_by(*order_by).pagination(**pagination)
             return APIResponse(posts)
 
     @method_decorator(token_required, name='dispatch')
@@ -59,7 +64,8 @@ class PostView(View):
         data = json.loads(r.body)
         # tags = data.pop('tags') if 'tags' in data.keys() else []
         if kwargs.get('post_id'):
-            post = Post.objects.get_or_api_404(id=kwargs.get('post_id')).update_fields(**data)
+            post = Post.objects.get_or_api_404(
+                id=kwargs.get('post_id')).update_fields(**data)
         else:
             post = Post.create(**data, author=r.user)
         return APIResponse(post.to_dict())
@@ -74,8 +80,11 @@ class PostView(View):
 
 
 def index(r):
-    return render(r, 'index.html')
-    return APIResponse(dict(name='hello world'))
+    return APIResponse(dict(
+        name='hello world!',
+        hostname=os.environ.get('HOSTNAME', 'none'),
+        index=1
+    ))
 
 
 @require_POST

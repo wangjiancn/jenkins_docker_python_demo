@@ -18,11 +18,14 @@ pipeline {
         }
         stage('Deploy') {
             agent any
+            when { tag }
             steps {
                 sh 'find -maxdepth 2'
                 script{
+                    def tag = sh(returnStdout: true, script: "git tag --sort version:refname | tail -1").trim()
+                    println tag
                     docker.withRegistry("https://${env.DOCKER_REG_ALI}", "docker") {
-                        django_project.push()
+                        django_project.push(tag)
                     }
                 }
                 sh "echo Deploy completed"

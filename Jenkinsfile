@@ -8,6 +8,7 @@ pipeline {
             agent any
                 steps{
                     sh "printenv"
+                    sh "echo ${BUILD_DATE_FORMATTED, "yyyy-MM-dd"}"
                     sh "echo printenv complete"
                     script{
                         docker.withRegistry("https://${env.DOCKER_REG_ALI}", "docker") {

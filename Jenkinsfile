@@ -8,7 +8,7 @@ pipeline {
             agent any
                 steps{
                     sh "printenv"
-                    tag = VersionNumber (versionNumberString: '${BUILD_DATE_FORMATTED, "yyyyMMdd"}-develop-${BUILDS_TODAY}')
+                    tag = VersionNumber(versionNumberString: '${BUILD_DATE_FORMATTED, "yyyyMMdd"}')
                     sh "echo ${tag}"
                     sh "echo printenv complete"
                     script{

@@ -18,6 +18,7 @@ pipeline {
         }
         stage('Deploy') {
             agent any
+            when { tag "*" }
             steps {
                 sh 'find -maxdepth 2'
                 script{

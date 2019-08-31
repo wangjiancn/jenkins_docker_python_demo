@@ -29,6 +29,7 @@ pipeline {
                         }
                     }
                 }
+                
                 sh "echo Deploy completed"
             }
         }

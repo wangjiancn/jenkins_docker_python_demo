@@ -8,7 +8,6 @@ pipeline {
             agent any
             steps{
                 sh "printenv"
-                sh "echo printenv complete"
                 script{
                     docker.withRegistry("https://${env.DOCKER_REG_ALI}", "docker") {
                         django_project = docker.build("${env.DOCKER_REG_ALI}/test-docker-image:${env.BUILD_ID}","-f ./docker/Dockerfile.v8 .")

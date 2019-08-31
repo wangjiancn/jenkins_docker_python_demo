@@ -23,7 +23,6 @@ pipeline {
             steps {
                 sh 'find -maxdepth 2'
                 sh "echo Deploy completed"
-            }
         }
     }
 }

@@ -21,7 +21,7 @@ pipeline {
             steps {
                 sh 'find -maxdepth 2'
                 script{
-                    def tag = sh(returnStdout: true, script: "ggit tag -l --points-at HEAD").trim()
+                    def tag = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim()
                     println tag
                     if(tag){
                         docker.withRegistry("https://${env.DOCKER_REG_ALI}", "docker") {

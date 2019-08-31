@@ -6,10 +6,11 @@ pipeline {
     stages {
         stage('Build') {
             agent any
-            steps
+            steps{
                 sh "printenv"
-                sh "echo ${TAG}"
                 sh "echo printenv complete"
+                tag = VersionNumber(versionNumberString: ' ${BUILD_DATE_FORMATTED, \'yyyy-MM-dd\'}')
+                sh "echo ${tag}"
                 script{
                     docker.withRegistry("https://${env.DOCKER_REG_ALI}", "docker") {
                         def django_project = docker.build("${env.DOCKER_REG_ALI}/test-docker-image:${env.BUILD_ID}","-f ./docker/Dockerfile.v8 .")
@@ -23,6 +24,7 @@ pipeline {
             steps {
                 sh 'find -maxdepth 2'
                 sh "echo Deploy completed"
+            }
         }
     }
 }

@@ -9,8 +9,8 @@ pipeline {
             steps{
                 sh "printenv"
                 script{
-                    tag = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim()
-                    println tag
+                    // tag = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim()
+                    // println tag
                     build_id = build.getBuildVariables().get('BUILD_ID')
                     println build_id 
                     date = new Date().format("YYYYMMdd")

@@ -9,7 +9,7 @@ pipeline {
             steps{
                 sh "printenv"
                 script{
-                    def tag = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim()
+                    tag = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim()
                     println tag
                     build_id = build.getBuildVariables().get('BUILD_ID')
                     println build_id 

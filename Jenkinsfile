@@ -9,19 +9,15 @@ pipeline {
             steps{
                 sh "printenv"
                 script{
-                    tag = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim()
-                    println tag
-                    println env.DDD
-                    build_id = env.BUILD_ID
-                    println build_id 
+                    // tag = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim()
+                    // println tag // 输出为空
+                    // println env.DDD // 输出 null
                     date = new Date().format("YYYYMMdd")
-                    println date
                     commit = env.GIT_COMMIT
                     short_commit = commit ? commit[0..6] : ""
-                    println commit
-                    println short_commit 
+                    local_tag = date + short_commit
                     docker.withRegistry("https://${env.DOCKER_REG_ALI}", "docker") {
-                        django_project = docker.build("${env.DOCKER_REG_ALI}/test-docker-image:${env.BUILD_ID}","-f ./docker/Dockerfile.v8 .")
+                        django_project = docker.build("${env.DOCKER_REG_ALI}/test-docker-image:${local_tag}","-f ./docker/Dockerfile.v8 .")
                     }
                 }
             }

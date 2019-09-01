@@ -11,11 +11,11 @@ pipeline {
                 script{
                     def tag = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim()
                     println tag
-                    test = "${env.BUILD_ID}"
-                    println test
+                    build_id = build.getBuildVariables().get('BUILD_ID')
+                    println build_id 
                     date = new Date().format("YYYYMMdd")
                     println date
-                    commit = "${env.GIT_COMMIT}
+                    commit = build.getBuildVariables().get("GIT_COMMIT")
                     short_commit = commit ? commit[0..6] : ""
                     println commit
                     println short_commit 

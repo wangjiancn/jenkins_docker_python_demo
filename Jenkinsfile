@@ -9,7 +9,10 @@ pipeline {
             steps{
                 sh "printenv"
                 script{
-                    println env
+                    def fields = env.getEnvironment()
+                    fields.each {
+                        key, value -> println("${key} = ${value}");
+                    }
                     // tag = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim()
                     // println tag
                     // build_id = build.getBuildVariables().get('BUILD_ID')

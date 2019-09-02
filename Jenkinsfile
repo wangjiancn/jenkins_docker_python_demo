@@ -28,6 +28,7 @@ pipeline {
             steps {
                 sh 'find -maxdepth 2'
                 script{
+                    
                     def tag = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim()
                     test = "${env.BUILD_ID}"
                     println test

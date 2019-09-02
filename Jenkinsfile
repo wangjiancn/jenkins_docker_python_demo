@@ -12,10 +12,10 @@ pipeline {
                     // tag = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim()
                     // println tag // 输出为空
                     // println env.DDD // 输出 null
-                    date = new Date().format("YYYYMMdd")
-                    commit = env.GIT_COMMIT
-                    short_commit = commit ? commit[0..6] : ""
-                    local_tag = date + short_commit
+                    def date = new Date().format("YYYYMMdd")
+                    def commit = env.GIT_COMMIT
+                    def short_commit = commit ? commit[0..6] : ""
+                    def local_tag = date + "-" + short_commit
                     docker.withRegistry("https://${env.DOCKER_REG_ALI}", "docker") {
                         django_project = docker.build("${env.DOCKER_REG_ALI}/test-docker-image:${local_tag}","-f ./docker/Dockerfile.v8 .")
                     }

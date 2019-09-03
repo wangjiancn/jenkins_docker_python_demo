@@ -33,6 +33,11 @@ COPY blog .
 COPY docker/uwsgi.ini .
 COPY docker/default.conf /etc/nginx/conf.d/default.conf
 
+ARG version='none'
+ARG date="none"
+
+ENV VERSION=${version}
+ENV RELASE_DATETIME=${date}
 
 
 EXPOSE 8000

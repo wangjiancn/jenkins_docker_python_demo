@@ -28,15 +28,18 @@ pipeline {
             agent any
             when { tag "*" }
             steps {
-                sh 'find -maxdepth 2'
                 script{
                     def tag = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim()
+                    def date = sh(returnStdout: true, script: "date '+%Y%m%d%H%M'").trim()
                     test = "${env.BUILD_ID}"
                     println test
                     println tag
                     if(tag){
                         docker.withRegistry("https://${env.DOCKER_REG_ALI}", "docker") {
-                            django_project.push(tag)
+                            django_project = docker.build(
+                                "${env.DOCKER_REG_ALI}/test-docker-image:${local_tag}",
+                                "--build-arg version=${tag} --build-arg date=${date}  -f ./docker/Dockerfile.v8 ."
+                                )
                         }
                     }
                 }

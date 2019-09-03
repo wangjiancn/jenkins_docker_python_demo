@@ -18,6 +18,8 @@ class APIMiddleware(MiddlewareMixin):
         response = self.get_response(request)
 
         response['X-Instance-ID'] = os.environ.get('HOSTNAME', 'none')
+        response['X-Instance-Version'] = os.environ.get('VERSION', 'none')
+        response['X-Relase-Datetime'] = os.environ.get('RELASE_DATETIME', 'none')
 
         # Code to be executed for each request/response after
         # the view is called.

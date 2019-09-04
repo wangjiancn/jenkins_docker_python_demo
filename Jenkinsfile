@@ -18,7 +18,7 @@ pipeline {
                         image = docker.build("${IMAGE_NAME}:${local_tag}","-f ./docker/Dockerfile.v8 .")
                     }
                 }
-                sh "docker rmi ${${IMAGE_NAME}:${local_tag}"
+                sh "docker rmi ${IMAGE_NAME}:${local_tag}"
             }
         }
         stage('Deploy') {

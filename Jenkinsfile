@@ -9,18 +9,14 @@ pipeline {
             steps{
                 sh "printenv"
                 script{
-                    // tag = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim()
-                    // println tag // 输出为空
-                    // println env.DDD // 输出 null
                     def date = new Date().format("YYYYMMdd")
                     def commit = env.GIT_COMMIT
                     def short_commit = commit ? commit[0..6] : ""
-                    def local_tag = date + "-" + short_commit
+                    local_tag = date + "-" + short_commit
+                    IMAGE_NAME = "${env.DOCKER_REG_ALI}/test-docker-image"
                     docker.withRegistry("https://${env.DOCKER_REG_ALI}", "docker") {
-                        django_project = docker.build("${env.DOCKER_REG_ALI}/test-docker-image:${local_tag}","-f ./docker/Dockerfile.v8 .")
+                        image = docker.build("${IMAGE_NAME}:${local_tag}","-f ./docker/Dockerfile.v8 .")
                     }
-                    def tag = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim()
-                    println tag
                 }
             }
         }
@@ -29,17 +25,14 @@ pipeline {
             when { tag "*" }
             steps {
                 script{
-                    def tag = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim()
-                    def date = sh(returnStdout: true, script: "date '+%Y%m%d%H%M'").trim()
-                    println tag
-                    if(tag){
-                        docker.withRegistry("https://${env.DOCKER_REG_ALI}", "docker") {
-                            django_project = docker.build(
-                                "${env.DOCKER_REG_ALI}/test-docker-image:${tag}",
-                                "--build-arg version=${tag} --build-arg date=${date}  -f ./docker/Dockerfile.v8 ."
-                                )
-                            django_project.push()
-                        }
+                // 出现两个Tag取最后一个
+                def tag = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim().split("\n")[-1]
+                    docker.withRegistry("https://${env.DOCKER_REG_ALI}", "docker") {
+                        image = docker.build(
+                            "${IMAGE_NAME}:${tag}",
+                            "--build-arg version=${tag} --build-arg date=${local_tag}  -f ./docker/Dockerfile.v8 ."
+                            )
+                        image.push()
                     }
                 }
                 sh "echo Deploy completed"

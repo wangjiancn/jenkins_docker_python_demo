@@ -18,6 +18,7 @@ pipeline {
                         image = docker.build("${IMAGE_NAME}:${local_tag}","-f ./docker/Dockerfile.v8 .")
                     }
                 }
+                // test something
                 sh "docker rmi ${IMAGE_NAME}:${local_tag}"
             }
         }
@@ -27,8 +28,6 @@ pipeline {
             steps {
                 script{
                     // 出现两个Tag取最后一个
-                    def tag1 = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim()
-                    println tag1
                     def tag = sh(returnStdout: true, script: "git tag -l --points-at HEAD").trim().split("\n")[-1]
                     println tag
                     docker.withRegistry("https://${env.DOCKER_REG_ALI}", "docker") {
@@ -38,9 +37,6 @@ pipeline {
                             )
                         image.push()
                     }
-                    println image
-                    println image.name
-                    println image.tag
                 }
                 sh "echo Deploy completed"
             }
